@@ -39,6 +39,7 @@
         <div v-else class="file-name">✅ Selected: {{ file.name }}</div>
         <div class="el-upload__tip">Only image files are supported</div>
       </el-upload>
+      <img v-if="previewUrl" :src="previewUrl" class="preview-image" alt="Preview" />
 
       <label for="weight"><strong>Weight (lb/bu):</strong></label>
       <el-input id="weight" v-model="weight" type="number" placeholder="e.g., 56" />
@@ -46,7 +47,8 @@
       <label for="moisture"><strong>Moisture (%):</strong></label>
       <el-input id="moisture" v-model="moisture" type="number" placeholder="e.g., 15.5" />
 
-      <el-button type="primary" @click="submitImage" :loading="loading">Analyze</el-button>
+      <el-button type="primary" @click="submitImage" :loading="loading" :disabled="!file">Analyze</el-button>
+      <el-button @click="resetForm" type="info" v-if="file">Reset</el-button>
       <div v-if="error" class="error">{{ error }}</div>
     </div>
 
@@ -85,6 +87,7 @@ import { ref, nextTick } from 'vue'
 import { uploadImage } from './api.js'
 
 const file = ref(null)
+const previewUrl = ref(null)
 const weight = ref(56)
 const moisture = ref(15.5)
 const result = ref(null)
@@ -95,11 +98,15 @@ const activeTab = ref('summary')
 const backendUrl = 'https://corn-grader.onrender.com'
 
 function handleFileChange(upload) {
+  if (previewUrl.value) URL.revokeObjectURL(previewUrl.value)
   file.value = upload.raw
+  previewUrl.value = URL.createObjectURL(upload.raw)
 }
 
 function resetForm() {
   file.value = null
+  if (previewUrl.value) URL.revokeObjectURL(previewUrl.value)
+  previewUrl.value = null
   result.value = null
   error.value = ''
   weight.value = 56
@@ -172,20 +179,17 @@ async function submitImage() {
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
-body {
-  font-family: 'Inter', sans-serif;
-}
-
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600&family=Noto+Sans+Thai:wght@400;600&display=swap');
 body {
   margin: 0;
-  background-color: #121212;
-  color: white;
-  font-family: 'Segoe UI', sans-serif;
+  background-color: #f5f5f5;
+  color: #222;
+  font-family: 'Noto Sans Thai', 'Noto Sans', sans-serif;
 }
 
 .container {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   align-items: flex-start;
   padding: 2rem;
@@ -196,9 +200,10 @@ body {
   width: 100%;
   max-width: 500px;
   padding: 2rem;
-  background: #1c1c1c;
+  background: #ffffff;
+  color: #222;
   border-radius: 10px;
-  box-shadow: 0 0 12px rgba(0,0,0,0.5);
+  box-shadow: 0 0 12px rgba(0,0,0,0.1);
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -210,13 +215,20 @@ body {
   padding: 20px;
   text-align: center;
   cursor: pointer;
+  background: #fafafa;
 }
 .upload-area:hover {
-  background: #283c5a;
+  background: #e6f0ff;
 }
 .file-name {
   font-weight: bold;
   color: #00e676;
+}
+.preview-image {
+  width: 100%;
+  margin-top: 10px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
 }
 .result-image {
   width: 100%;
@@ -226,8 +238,8 @@ body {
 }
 .json-box {
   margin-top: 10px;
-  background: #1e1e1e;
-  color: #c5f3ff;
+  background: #f2f2f2;
+  color: #333;
   padding: 1rem;
   font-family: monospace;
   font-size: 0.85rem;
@@ -240,11 +252,11 @@ body {
 }
 
 .usda-float {
-  background: #1f1f1f;
-  color: #fff;
+  background: #fafafa;
+  color: #222;
   padding: 1rem;
   border-radius: 10px;
-  box-shadow: 0 0 8px rgba(0,0,0,0.3);
+  box-shadow: 0 0 8px rgba(0,0,0,0.1);
   max-width: 350px;
   font-size: 14px;
 }
@@ -259,6 +271,6 @@ body {
   text-align: center;
 }
 .usda-float th {
-  background-color: #333;
+  background-color: #eee;
 }
 </style>
