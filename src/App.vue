@@ -30,7 +30,7 @@
       </el-form>
 
       <div v-if="error" class="text-red-500 mt-4">{{ error }}</div>
-      <div v-if="result" class="mt-4 whitespace-pre-wrap">{{ result }}</div>
+      <div v-if="result" class="mt-4" v-html="result"></div>
     </el-container>
   </div>
 </template>
