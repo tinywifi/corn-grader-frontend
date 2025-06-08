@@ -26,10 +26,36 @@
 
       <div v-if="result" ref="resultSection" class="result">
         <h3>Result</h3>
+        <div class="usda-grade-info">
+        <h4>📊 ระดับเกรดของข้าวโพดเมล็ดแห้งตาม USDA</h4>
+        <table>
+            <thead>
+            <tr>
+                <th>เกรด</th><th>น้ำหนัก (lb/bu)</th><th>ความชื้น (%)</th><th>เมล็ดเสียหายรวม (%)</th><th>เสียหายจากความร้อน (%)</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr><td>U.S. No. 1</td><td>56.0</td><td>15.5</td><td>≤3.0</td><td>≤0.1</td></tr>
+            <tr><td>U.S. No. 2</td><td>54.0</td><td>15.5</td><td>≤5.0</td><td>≤0.2</td></tr>
+            <tr><td>U.S. No. 3</td><td>52.0</td><td>15.5</td><td>≤7.0</td><td>≤0.5</td></tr>
+            <tr><td>U.S. No. 4</td><td>49.0</td><td>15.5</td><td>≤10.0</td><td>≤1.0</td></tr>
+            <tr><td>U.S. No. 5</td><td>46.0</td><td>15.5</td><td>≤15.0</td><td>≤3.0</td></tr>
+            <tr><td>Sample Grade</td><td>-</td><td>-</td><td>>15.0</td><td>>3.0</td></tr>
+            </tbody>
+        </table>
+        </div>
         <p><strong>Grade:</strong> {{ result.grade }}</p>
         <p><strong>Total Kernels:</strong> {{ result.total_kernels }}</p>
         <p><strong>Total Damage %:</strong> {{ result.total_damage_pct.toFixed(2) }}%</p>
         <p><strong>Heat Damage %:</strong> {{ result.heat_damage_pct.toFixed(2) }}%</p>
+        <div v-if="result.class_counts">
+        <h4>Kernel Class Breakdown</h4>
+        <ul>
+            <li v-for="(count, label) in result.class_counts" :key="label">
+            <strong>{{ label }}:</strong> {{ count }}
+            </li>
+        </ul>
+        </div>
         <img :src="backendUrl + '/results/' + result.filename" class="result-image" />
         <pre class="json-box">{{ JSON.stringify(result.raw_result, null, 2) }}</pre>
       </div>
@@ -85,7 +111,16 @@ async function submitImage() {
       total_damage_pct: parseFloat(getValueAfterLabel("Total damage %") || 0),
       heat_damage_pct: parseFloat(getValueAfterLabel("Heat damage %") || 0),
       filename: doc.querySelector('img')?.src?.split('/').pop(),
-      raw_result: JSON.parse(doc.querySelector('pre')?.textContent ?? "{}")
+      raw_result: JSON.parse(doc.querySelector('pre')?.textContent ?? "{}"),
+      class_counts: (() => {
+        try {
+            const text = doc.querySelector('pre')?.textContent ?? '{}'
+            const raw = JSON.parse(text)
+            return raw.class_counts ?? {}
+        } catch {
+            return {}
+        }
+        })(),
     }
 
     result.value = extracted
@@ -127,6 +162,26 @@ body {
   gap: 1rem;
   animation: fadeIn 0.4s ease;
 }
+
+.usda-grade-info {
+  margin-top: 20px;
+  background: #1e1e1e;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.usda-grade-info table {
+  width: 100%;
+  border-collapse: collapse;
+  color: #fff;
+}
+
+.usda-grade-info th, .usda-grade-info td {
+  border: 1px solid #444;
+  padding: 8px;
+  text-align: center;
+}
+
 
 .upload-area {
   border: 2px dashed #409EFF;
