@@ -73,11 +73,17 @@ async function submitImage() {
     const parser = new DOMParser()
     const doc = parser.parseFromString(html, 'text/html')
 
+    const getValueAfterLabel = (label) => {
+      const nodes = [...doc.querySelectorAll('strong')]
+      const target = nodes.find(n => n.textContent.trim().toLowerCase().includes(label.toLowerCase()))
+      return target ? target.nextSibling?.textContent?.trim() : ''
+    }
+
     const extracted = {
-      grade: doc.querySelector('strong:contains("Grade")')?.nextSibling?.textContent.trim() ?? 'Unknown',
-      total_kernels: Number(doc.querySelector('strong:contains("Total Kernels")')?.nextSibling?.textContent.trim() ?? 0),
-      total_damage_pct: parseFloat(doc.querySelector('strong:contains("Total damage %")')?.nextSibling?.textContent) ?? 0,
-      heat_damage_pct: parseFloat(doc.querySelector('strong:contains("Heat damage %")')?.nextSibling?.textContent) ?? 0,
+      grade: getValueAfterLabel("Grade") || 'Unknown',
+      total_kernels: Number(getValueAfterLabel("Total Kernels") || 0),
+      total_damage_pct: parseFloat(getValueAfterLabel("Total damage %") || 0),
+      heat_damage_pct: parseFloat(getValueAfterLabel("Heat damage %") || 0),
       filename: doc.querySelector('img')?.src?.split('/').pop(),
       raw_result: JSON.parse(doc.querySelector('pre')?.textContent ?? "{}")
     }
@@ -91,6 +97,7 @@ async function submitImage() {
     loading.value = false
   }
 }
+
 </script>
 
 <style>
