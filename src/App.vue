@@ -58,14 +58,15 @@
           <p><strong>Total Kernels:</strong> {{ result.total_kernels }}</p>
           <p><strong>Total Damage %:</strong> {{ result.total_damage_pct.toFixed(2) }}%</p>
           <p><strong>Heat Damage %:</strong> {{ result.heat_damage_pct.toFixed(2) }}%</p>
-          <div v-if="result.class_counts">
-            <h4>Kernel Class Breakdown</h4>
-            <ul>
-              <li v-for="(count, label) in result.class_counts" :key="label">
+          <div>
+            <strong>Kernel Class Breakdown</strong>
+            <ul v-if="result.class_counts && Object.keys(result.class_counts).length">
+            <li v-for="(count, label) in result.class_counts" :key="label">
                 <strong>{{ label }}:</strong> {{ count }}
-              </li>
+            </li>
             </ul>
-          </div>
+            <p v-else style="opacity: 0.7;">(No kernel class data available)</p>
+        </div>
           <img :src="backendUrl + '/results/' + result.filename" class="result-image" />
         </el-tab-pane>
 
@@ -161,6 +162,11 @@ async function submitImage() {
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+body {
+  font-family: 'Inter', sans-serif;
+}
+
 body {
   margin: 0;
   background-color: #121212;
