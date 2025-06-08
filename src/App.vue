@@ -141,13 +141,23 @@ async function submitImage() {
       raw_result: JSON.parse(doc.querySelector('pre')?.textContent ?? "{}"),
       class_counts: (() => {
         try {
-          const text = doc.querySelector('pre')?.textContent ?? '{}'
-          const raw = JSON.parse(text)
-          return raw.class_counts ?? {}
+            const text = doc.querySelector('pre')?.textContent ?? '{}'
+            const raw = JSON.parse(text)
+            const counts = {}
+
+            if (Array.isArray(raw.predictions)) {
+            for (const pred of raw.predictions) {
+                const label = pred.class
+                if (!counts[label]) counts[label] = 0
+                counts[label]++
+            }
+            }
+
+            return counts
         } catch {
-          return {}
+            return {}
         }
-      })(),
+        })(),
     }
 
     result.value = extracted
