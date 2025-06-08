@@ -17,8 +17,12 @@
         <div class="el-upload__tip">Only image files are supported</div>
       </el-upload>
 
-      <el-input v-model="weight" type="number" placeholder="Weight (lb/bu)" />
-      <el-input v-model="moisture" type="number" placeholder="Moisture (%)" />
+        <label for="weight"><strong>Weight (lb/bu):</strong></label>
+        <el-input id="weight" v-model="weight" type="number" placeholder="e.g., 56" />
+
+        <label for="moisture"><strong>Moisture (%):</strong></label>
+        <el-input id="moisture" v-model="moisture" type="number" placeholder="e.g., 15.5" />
+
 
       <el-button type="primary" @click="submitImage" :loading="loading">Analyze</el-button>
 
@@ -182,6 +186,11 @@ body {
   text-align: center;
 }
 
+label {
+  margin-top: 10px;
+  font-weight: bold;
+  color: #fff;
+}
 
 .upload-area {
   border: 2px dashed #409EFF;
