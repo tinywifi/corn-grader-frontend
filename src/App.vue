@@ -38,24 +38,37 @@
       <div v-if="error" class="error">{{ error }}</div>
     </div>
 
-    <div v-if="result" ref="resultSection" class="form-card">
-      <h3>Result</h3>
-      <p><strong>Grade:</strong> {{ result.grade }}</p>
-      <p><strong>Total Kernels:</strong> {{ result.total_kernels }}</p>
-      <p><strong>Total Damage %:</strong> {{ result.total_damage_pct.toFixed(2) }}%</p>
-      <p><strong>Heat Damage %:</strong> {{ result.heat_damage_pct.toFixed(2) }}%</p>
-      <div v-if="result.class_counts">
-        <h4>Kernel Class Breakdown</h4>
-        <ul>
-          <li v-for="(count, label) in result.class_counts" :key="label">
-            <strong>{{ label }}:</strong> {{ count }}
-          </li>
-        </ul>
-      </div>
-      <img :src="backendUrl + '/results/' + result.filename" class="result-image" />
-      <pre class="json-box">{{ JSON.stringify(result.raw_result, null, 2) }}</pre>
-      <el-button type="warning" @click="reset">🔙 Go Back</el-button>
+    <div v-if="result" ref="resultSection" class="result">
+    <h3>Result</h3>
+
+    <el-tabs type="border-card">
+        <el-tab-pane label="🌐 Summary">
+        <p><strong>Grade:</strong> {{ result.grade }}</p>
+        <p><strong>Smart Suggestion:</strong> {{ getGradeHint(result.total_damage_pct, result.heat_damage_pct) }}</p>
+        <p><strong>Total Kernels:</strong> {{ result.total_kernels }}</p>
+        <p><strong>Total Damage %:</strong> {{ result.total_damage_pct.toFixed(2) }}%</p>
+        <p><strong>Heat Damage %:</strong> {{ result.heat_damage_pct.toFixed(2) }}%</p>
+
+        <div v-if="result.class_counts">
+            <h4>Kernel Class Breakdown</h4>
+            <ul>
+            <li v-for="(count, label) in result.class_counts" :key="label">
+                <strong>{{ label }}:</strong> {{ count }}
+            </li>
+            </ul>
+        </div>
+
+        <img :src="backendUrl + '/results/' + result.filename" class="result-image" />
+        </el-tab-pane>
+
+        <el-tab-pane label="🧾 JSON Raw Output">
+        <pre class="json-box">{{ JSON.stringify(result.raw_result, null, 2) }}</pre>
+        </el-tab-pane>
+    </el-tabs>
+
+    <el-button style="margin-top: 1rem" @click="resetApp">🔙 Go Back</el-button>
     </div>
+
   </div>
 </template>
 
