@@ -5,8 +5,8 @@ export async function uploadImage(formData) {
     method: "POST",
     body: formData,
   })
-  if (!res.ok) {
-    throw new Error(`Server responded with ${res.status}`)
+  if (!response.ok) {
+    throw new Error(`Server responded with ${response.status}`)
   }
   return response.text();
 }
