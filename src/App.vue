@@ -5,7 +5,11 @@
       <table>
         <thead>
           <tr>
-            <th>เกรด</th><th>น้ำหนัก (lb/bu)</th><th>ความชื้น (%)</th><th>เมล็ดเสียหายรวม (%)</th><th>เสียหายจากความร้อน (%)</th>
+            <th>เกรด</th>
+            <th>น้ำหนัก (lb/bu)</th>
+            <th>ความชื้น (%)</th>
+            <th>เมล็ดเสียหายรวม (%)</th>
+            <th>เสียหายจากความร้อน (%)</th>
           </tr>
         </thead>
         <tbody>
@@ -21,7 +25,15 @@
 
     <div class="form-card" v-if="!result">
       <h2>🌽 Corn Kernel Analyzer</h2>
-      <el-upload drag action="" :auto-upload="false" :on-change="handleFileChange" :show-file-list="false" class="upload-area">
+
+      <el-upload
+        drag
+        action=""
+        :auto-upload="false"
+        :on-change="handleFileChange"
+        :show-file-list="false"
+        class="upload-area"
+      >
         <i class="el-icon-upload"></i>
         <div v-if="!file">📂 Drop file here or click to upload</div>
         <div v-else class="file-name">✅ Selected: {{ file.name }}</div>
@@ -38,37 +50,32 @@
       <div v-if="error" class="error">{{ error }}</div>
     </div>
 
-    <div v-if="result" ref="resultSection" class="result">
-    <h3>Result</h3>
-
-    <el-tabs type="border-card">
-        <el-tab-pane label="🌐 Summary">
-        <p><strong>Grade:</strong> {{ result.grade }}</p>
-        <p><strong>Smart Suggestion:</strong> {{ getGradeHint(result.total_damage_pct, result.heat_damage_pct) }}</p>
-        <p><strong>Total Kernels:</strong> {{ result.total_kernels }}</p>
-        <p><strong>Total Damage %:</strong> {{ result.total_damage_pct.toFixed(2) }}%</p>
-        <p><strong>Heat Damage %:</strong> {{ result.heat_damage_pct.toFixed(2) }}%</p>
-
-        <div v-if="result.class_counts">
+    <div v-if="result" ref="resultSection" class="result-card">
+      <h3>Result</h3>
+      <el-tabs v-model="activeTab">
+        <el-tab-pane label="📘 Summary" name="summary">
+          <p><strong>Grade:</strong> {{ result.grade }}</p>
+          <p><strong>Total Kernels:</strong> {{ result.total_kernels }}</p>
+          <p><strong>Total Damage %:</strong> {{ result.total_damage_pct.toFixed(2) }}%</p>
+          <p><strong>Heat Damage %:</strong> {{ result.heat_damage_pct.toFixed(2) }}%</p>
+          <div v-if="result.class_counts">
             <h4>Kernel Class Breakdown</h4>
             <ul>
-            <li v-for="(count, label) in result.class_counts" :key="label">
+              <li v-for="(count, label) in result.class_counts" :key="label">
                 <strong>{{ label }}:</strong> {{ count }}
-            </li>
+              </li>
             </ul>
-        </div>
-
-        <img :src="backendUrl + '/results/' + result.filename" class="result-image" />
+          </div>
+          <img :src="backendUrl + '/results/' + result.filename" class="result-image" />
         </el-tab-pane>
 
-        <el-tab-pane label="🧾 JSON Raw Output">
-        <pre class="json-box">{{ JSON.stringify(result.raw_result, null, 2) }}</pre>
+        <el-tab-pane label="📄 JSON Raw Output" name="json">
+          <pre class="json-box">{{ JSON.stringify(result.raw_result, null, 2) }}</pre>
         </el-tab-pane>
-    </el-tabs>
+      </el-tabs>
 
-    <el-button style="margin-top: 1rem" @click="resetApp">🔙 Go Back</el-button>
+      <el-button @click="resetForm" type="info" icon="el-icon-back">Go Back</el-button>
     </div>
-
   </div>
 </template>
 
@@ -83,10 +90,20 @@ const result = ref(null)
 const loading = ref(false)
 const error = ref('')
 const resultSection = ref(null)
+const activeTab = ref('summary')
 const backendUrl = 'https://corn-grader.onrender.com'
 
 function handleFileChange(upload) {
   file.value = upload.raw
+}
+
+function resetForm() {
+  file.value = null
+  result.value = null
+  error.value = ''
+  weight.value = 56
+  moisture.value = 15.5
+  activeTab.value = 'summary'
 }
 
 async function submitImage() {
@@ -114,7 +131,7 @@ async function submitImage() {
       return target ? target.nextSibling?.textContent?.trim() : ''
     }
 
-    result.value = {
+    const extracted = {
       grade: getValueAfterLabel("Grade") || 'Unknown',
       total_kernels: Number(getValueAfterLabel("Total Kernels") || 0),
       total_damage_pct: parseFloat(getValueAfterLabel("Total damage %") || 0),
@@ -123,7 +140,8 @@ async function submitImage() {
       raw_result: JSON.parse(doc.querySelector('pre')?.textContent ?? "{}"),
       class_counts: (() => {
         try {
-          const raw = JSON.parse(doc.querySelector('pre')?.textContent ?? '{}')
+          const text = doc.querySelector('pre')?.textContent ?? '{}'
+          const raw = JSON.parse(text)
           return raw.class_counts ?? {}
         } catch {
           return {}
@@ -131,6 +149,7 @@ async function submitImage() {
       })(),
     }
 
+    result.value = extracted
     await nextTick()
     resultSection.value?.scrollIntoView({ behavior: 'smooth' })
   } catch (err) {
@@ -139,18 +158,13 @@ async function submitImage() {
     loading.value = false
   }
 }
-
-function reset() {
-  file.value = null
-  result.value = null
-  error.value = ''
-}
 </script>
 
-<style>
+<style scoped>
 body {
   margin: 0;
-  background-color: #f4f4f4;
+  background-color: #121212;
+  color: white;
   font-family: 'Segoe UI', sans-serif;
 }
 
@@ -160,47 +174,18 @@ body {
   align-items: flex-start;
   padding: 2rem;
   gap: 2rem;
-  flex-wrap: wrap;
 }
 
-.form-card {
+.form-card, .result-card {
   width: 100%;
   max-width: 500px;
   padding: 2rem;
-  background: white;
+  background: #1c1c1c;
   border-radius: 10px;
-  box-shadow: 0 0 12px rgba(0,0,0,0.1);
+  box-shadow: 0 0 12px rgba(0,0,0,0.5);
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  animation: fadeIn 0.4s ease;
-}
-
-.usda-float {
-  background: #1f1f1f;
-  color: #fff;
-  padding: 1rem;
-  border-radius: 10px;
-  box-shadow: 0 0 8px rgba(0,0,0,0.3);
-  max-width: 350px;
-  font-size: 14px;
-}
-
-.usda-float table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.usda-float th, .usda-float td {
-  padding: 0.3rem;
-  border: 1px solid #444;
-  text-align: center;
-}
-
-label {
-  margin-top: 10px;
-  font-weight: bold;
-  color: #fff;
 }
 
 .upload-area {
@@ -209,25 +194,20 @@ label {
   padding: 20px;
   text-align: center;
   cursor: pointer;
-  transition: background 0.2s;
 }
-
 .upload-area:hover {
-  background: #f0f8ff;
+  background: #283c5a;
 }
-
 .file-name {
   font-weight: bold;
-  color: green;
+  color: #00e676;
 }
-
 .result-image {
   width: 100%;
   margin-top: 10px;
   border: 1px solid #ddd;
   border-radius: 6px;
 }
-
 .json-box {
   margin-top: 10px;
   background: #1e1e1e;
@@ -241,11 +221,28 @@ label {
 
 .error {
   color: red;
-  margin-top: 10px;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+.usda-float {
+  background: #1f1f1f;
+  color: #fff;
+  padding: 1rem;
+  border-radius: 10px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.3);
+  max-width: 350px;
+  font-size: 14px;
+}
+.usda-float table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.usda-float th,
+.usda-float td {
+  padding: 0.3rem;
+  border: 1px solid #444;
+  text-align: center;
+}
+.usda-float th {
+  background-color: #333;
 }
 </style>
