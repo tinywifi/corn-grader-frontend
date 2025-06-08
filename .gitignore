@@ -1,0 +1,38 @@
+# General
+*.log
+*.pyc
+*.pyo
+__pycache__/
+.env
+.env.local
+
+# Python / Flask
+instance/
+uploads/
+results/
+.vscode/
+.idea/
+*.sqlite3
+*.db
+
+# Virtualenv
+venv/
+ENV/
+env/
+.venv/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Vue / Node
+node_modules/
+dist/
+*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Render-specific
+.render/
+
