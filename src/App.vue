@@ -1,5 +1,27 @@
 <template>
   <div class="container">
+    <div class="usda-float">
+    <h3>📊 ระดับเกรดของข้าวโพดเมล็ดแห้งตาม USDA</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>เกรด</th>
+            <th>น้ำหนัก (lb/bu)</th>
+            <th>ความชื้น (%)</th>
+            <th>เมล็ดเสียหายรวม (%)</th>
+            <th>เสียหายจากความร้อน (%)</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr><td>U.S. No. 1</td><td>56.0</td><td>15.5</td><td>≤3.0</td><td>≤0.1</td></tr>
+        <tr><td>U.S. No. 2</td><td>54.0</td><td>15.5</td><td>≤5.0</td><td>≤0.2</td></tr>
+        <tr><td>U.S. No. 3</td><td>52.0</td><td>15.5</td><td>≤7.0</td><td>≤0.5</td></tr>
+        <tr><td>U.S. No. 4</td><td>49.0</td><td>15.5</td><td>≤10.0</td><td>≤1.0</td></tr>
+        <tr><td>U.S. No. 5</td><td>46.0</td><td>15.5</td><td>≤15.0</td><td>≤3.0</td></tr>
+        <tr><td>Sample Grade</td><td>-</td><td>-</td><td>>15.0</td><td>>3.0</td></tr>
+        </tbody>
+    </table>
+    </div>
     <div class="form-card">
       <h2>🌽 Corn Kernel Analyzer</h2>
 
@@ -30,24 +52,6 @@
 
       <div v-if="result" ref="resultSection" class="result">
         <h3>Result</h3>
-        <div class="usda-grade-info">
-        <h4>📊 ระดับเกรดของข้าวโพดเมล็ดแห้งตาม USDA</h4>
-        <table>
-            <thead>
-            <tr>
-                <th>เกรด</th><th>น้ำหนัก (lb/bu)</th><th>ความชื้น (%)</th><th>เมล็ดเสียหายรวม (%)</th><th>เสียหายจากความร้อน (%)</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr><td>U.S. No. 1</td><td>56.0</td><td>15.5</td><td>≤3.0</td><td>≤0.1</td></tr>
-            <tr><td>U.S. No. 2</td><td>54.0</td><td>15.5</td><td>≤5.0</td><td>≤0.2</td></tr>
-            <tr><td>U.S. No. 3</td><td>52.0</td><td>15.5</td><td>≤7.0</td><td>≤0.5</td></tr>
-            <tr><td>U.S. No. 4</td><td>49.0</td><td>15.5</td><td>≤10.0</td><td>≤1.0</td></tr>
-            <tr><td>U.S. No. 5</td><td>46.0</td><td>15.5</td><td>≤15.0</td><td>≤3.0</td></tr>
-            <tr><td>Sample Grade</td><td>-</td><td>-</td><td>>15.0</td><td>>3.0</td></tr>
-            </tbody>
-        </table>
-        </div>
         <p><strong>Grade:</strong> {{ result.grade }}</p>
         <p><strong>Total Kernels:</strong> {{ result.total_kernels }}</p>
         <p><strong>Total Damage %:</strong> {{ result.total_damage_pct.toFixed(2) }}%</p>
@@ -226,6 +230,41 @@ label {
   border-radius: 6px;
   overflow-x: auto;
 }
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem;
+  gap: 2rem;
+}
+
+.usda-float {
+  background: #1f1f1f;
+  color: #fff;
+  padding: 1rem;
+  border-radius: 10px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.3);
+  max-width: 350px;
+  font-size: 14px;
+}
+
+.usda-float table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.usda-float th,
+.usda-float td {
+  padding: 0.3rem;
+  border: 1px solid #444;
+  text-align: center;
+}
+
+.usda-float th {
+  background-color: #333;
+}
+
 
 .error {
   color: red;
